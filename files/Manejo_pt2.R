@@ -10,6 +10,13 @@ library(tidylog) #informacion de las operaciones de las funciones tidyverse
 
 ## ---------------------------------------------------------
 
+## Leer y guardar datos
+
+# read_csv() - Leer datos
+# write_csv() - Guardar datos
+
+## ---------------------------------------------------------
+
 ## Principales funciones de dply ##
 
 # arrange() - Ordenar variable por casos 
@@ -121,6 +128,8 @@ dt_clean <- dt |>
   filter(fruits != 0)
 
 
+write.csv(dt_clean, "files/data_clean.csv")
+
 
 
 
@@ -172,9 +181,6 @@ dt_diam <- dt_clean |>
             diam_sd = sd(stem_diameter_cm, na.rm = TRUE))
 
 dt_diam
-
-
-
 
 
 
