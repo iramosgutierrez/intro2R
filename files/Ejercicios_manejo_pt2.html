@@ -497,6 +497,28 @@ menor.</p>
 </div>
 <div id="ejercicio-2" class="section level2">
 <h2>Ejercicio 2</h2>
+<p>Usando la base de datos (dt_ej) crear una nueva variable llamada
+“periodo” que separe “antes” y “despues” del año 2000.</p>
+<pre class="r"><code>dt_ej |&gt;
+  mutate(periodo = if_else(year &lt; 2000, &quot;antes&quot;, &quot;despues&quot;)) |&gt; 
+  select(site_name, year, periodo)</code></pre>
+<pre><code>## # A tibble: 82,281 × 3
+##    site_name  year periodo
+##    &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;  
+##  1 AND        1962 antes  
+##  2 AND        1965 antes  
+##  3 AND        1967 antes  
+##  4 AND        1968 antes  
+##  5 AND        1971 antes  
+##  6 AND        1974 antes  
+##  7 AND        1976 antes  
+##  8 AND        1978 antes  
+##  9 AND        1979 antes  
+## 10 AND        1980 antes  
+## # ℹ 82,271 more rows</code></pre>
+</div>
+<div id="ejercicio-3" class="section level2">
+<h2>Ejercicio 3</h2>
 <p>Usando la base de datos (dt_ej) filtrar por sitios con método de
 conteo tipo “TRAP” y calcular cantidad máxima y mínima de frutos por m2
 para cada sitio.</p>
@@ -514,8 +536,8 @@ para cada sitio.</p>
 ## 4 HBR             244      9.34
 ## 5 LUQ         1114340    133.</code></pre>
 </div>
-<div id="ejercicio-3" class="section level2">
-<h2>Ejercicio 3</h2>
+<div id="ejercicio-4" class="section level2">
+<h2>Ejercicio 4</h2>
 <p>Usando la base de datos (dt_ej), quedarnos sólo con el sitio “AND” y
 con datos de diametro mayor que 0, y calcular diámetro medio y SD para
 cada especie de árbol (<code>species_name</code>).</p>
@@ -539,8 +561,8 @@ cada especie de árbol (<code>species_name</code>).</p>
 ##  9 Pinus_monticola    63.4    22.4
 ## 10 Tsuga_mertensiana  56.5    12.5</code></pre>
 </div>
-<div id="ejercicio-4" class="section level2">
-<h2>Ejercicio 4</h2>
+<div id="ejercicio-5" class="section level2">
+<h2>Ejercicio 5</h2>
 <p>Usando la base de datos (dt_ej), calcular el número de árboles
 mayores de 40cm de diámetro y menores de 40cm de diámetro.</p>
 <pre class="r"><code>dt_ej |&gt;
@@ -568,8 +590,8 @@ mayores de 40cm de diámetro y menores de 40cm de diámetro.</p>
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 <pre class="r"><code>dt_ej2 &lt;- dt_ej |&gt; 
   left_join(sp_info, by = c(&quot;species_name&quot;))</code></pre>
-<div id="ejercicio-5" class="section level2">
-<h2>Ejercicio 5</h2>
+<div id="ejercicio-6" class="section level2">
+<h2>Ejercicio 6</h2>
 <p>Con el nuevo dataset (dt_ej2) contar numero medio de frutos para los
 distintos tipos de micorrizas (<code>mycorrhiza_type</code>)</p>
 <pre class="r"><code>dt_ej2 |&gt; 
@@ -584,8 +606,8 @@ distintos tipos de micorrizas (<code>mycorrhiza_type</code>)</p>
 ## 4 ericoid          24.7 
 ## 5 &lt;NA&gt;             12.6</code></pre>
 </div>
-<div id="ejercicio-6" class="section level2">
-<h2>Ejercicio 6</h2>
+<div id="ejercicio-7" class="section level2">
+<h2>Ejercicio 7</h2>
 <p>Con el nuevo dataset (dt_ej2) calcular numero máximo de frutos para
 los distintos tipos de tolerancia a la sombra
 (<code>shade_tolerance</code>) y crear una tabla donde las columnas sean

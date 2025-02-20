@@ -76,6 +76,11 @@ dt |>
 
 ## Crear nueva variable - funcion mutate()
 dt |> 
+  # nueva variable
+  mutate(country = "USA")
+
+## Crear nueva variable - funcion mutate()
+dt |> 
   # convertir unidades (de cm a m)
   mutate(stem_m = stem_diameter_cm/100) |> 
   arrange(desc(stem_m))
@@ -98,7 +103,7 @@ dt |>
 
 ## ---------------------------------------------------------
 
-## Extraer valores unicos para vriables categoricas
+## Extraer valores unicos para variables categoricas
 dt |> distinct(general_method)
 
 dt |> distinct(site_name, general_method)
@@ -127,6 +132,9 @@ dt_clean <- dt |>
 write.csv(dt_clean, "files/data_clean.csv")
 
 
+## ---------------------------------------------------------
+# Hacer ejercicios 1 y 2
+## ---------------------------------------------------------
 
 
 
@@ -170,6 +178,12 @@ dt_sum <- dt |>
 
 dt_sum
 
+## ---------------------------------------------------------
+# Hacer ejercicios 3 al 5
+## ---------------------------------------------------------
+
+
+
 
 
 
@@ -194,6 +208,12 @@ sp_info |> count(shade_tolerance)
 #crear dataset combinado
 dt_comb <- dt_raw |> 
   left_join(sp_info, by = c("species_name"))
+
+
+## ---------------------------------------------------------
+# Hacer ejercicios 6 y 7
+## ---------------------------------------------------------
+
 
 
 
