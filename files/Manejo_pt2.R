@@ -46,12 +46,11 @@ glimpse(dt_raw)
 ## Seleccionar datos de interes
 dt <- dt_raw |> 
   select(site_name,
-         species_name,
          year,
-         fruits = count,
+         count,
          stem_diameter_cm,
          trap_area_m2,
-         method = general_method)
+         general_method)
 
 ## ---------------------------------------------------------
 
@@ -62,11 +61,11 @@ dt |>
 
 dt |>
   #quitar observaciones con 0 numero de frutos o sin datos
-  filter(fruits != 0)
+  filter(count != 0)
 
 dt |>
-  #quitar observaciones sin datos para numero de frutos
-  filter(!is.na(fruits))
+  #quitar observaciones sin datos para numero de frutos y diametro
+  filter(!is.na(count))
 
 
 
@@ -78,55 +77,52 @@ dt |>
 ## Crear nueva variable - funcion mutate()
 dt |> 
   # convertir unidades (de cm a m)
-  mutate(stem_m = stem_diameter_cm/100)
+  mutate(stem_m = stem_diameter_cm/100) |> 
+  arrange(desc(stem_m))
 
 ## Crear nueva variable - funcion mutate()
 dt |> 
   # numero de frutos por m2
-  mutate(fruits_m2 = fruits/trap_area_m2)
-
-## ---------------------------------------------------------
-
-dt |> 
-  # numero de frutos por m2
-  mutate(fruits_m2 = fruits/trap_area_m2) |> 
+  mutate(fruits_m2 = count/trap_area_m2) |> 
   ## Ordenar datos
   arrange(desc(fruits_m2))
 
+## ---------------------------------------------------------
+
 ## Arreglar casos o categorizar datos - funcion if_else() 
 dt |>
-  mutate(fruits_m2 = fruits/trap_area_m2) |> 
+  mutate(fruits_m2 = count/trap_area_m2) |> 
+  arrange(desc(fruits_m2)) |> 
   # quitar un valor equivocado 
-  mutate(fruits = if_else(fruits >= 200000, NA, fruits)) 
+  mutate(fruits_m2 = if_else(fruits_m2 >= 300000, NA, fruits_m2)) 
 
 ## ---------------------------------------------------------
 
 ## Extraer valores unicos para vriables categoricas
-dt |> distinct(method)
+dt |> distinct(general_method)
 
-dt |> distinct(site_name, method)
+dt |> distinct(site_name, general_method)
 
-## Funcion if_else para categorizar o arreglar casos
+## Funcion if_else para categorizar 
 dt |> 
   # calcular número de frutos por m2 
-  mutate(fruits_m2 = fruits/trap_area_m2) |> 
+  mutate(fruits_m2 = count/trap_area_m2) |> 
   # crear variable con la cantidad de frutos de count o corregida 
-  mutate(fruits_fix = if_else(method == "TRAP", fruits_m2, fruits))
+  mutate(fruits_fix = if_else(general_method == "TRAP", fruits_m2, count))
+
+
+
+
 
 ## ---------------------------------------------------------
-
-# Combinar todo lo anterior para crear nuevo dataset
+# GUARDAR BASES DE DATOS
+## ---------------------------------------------------------
 
 dt_clean <- dt |> 
-  # quitar un valor equivocado
-  mutate(fruits = if_else(fruits > 200000, NA, fruits)) |> 
   # calcular número de frutos por m2 
-  mutate(fruits_m2 = fruits/trap_area_m2) |> 
+  mutate(fruits_m2 = count/trap_area_m2) |> 
   # crear variable con la cantidad de frutos de count o corregida 
-  mutate(fruits_fix = if_else(method == "TRAP", fruits_m2, fruits)) |> 
-  # quitar valores de 0 o NA 
-  filter(fruits != 0)
-
+  mutate(fruits_fix = if_else(general_method == "TRAP", fruits_m2, count))
 
 write.csv(dt_clean, "files/data_clean.csv")
 
@@ -144,43 +140,35 @@ dt |>
   #1. agrupar por sitio
   group_by(site_name) |> 
   #2. sumar numero de frutos por sitio
-  summarise(fruits = sum(fruits))
+  summarise(fruits = sum(count))
 
 dt |>
   #1. agrupar por sitio
   group_by(site_name) |> 
   #2. sumar numero de frutos por sitio
   #añadir na.rm = TRUE para obviar NAs
-  summarise(fruits = sum(fruits, na.rm = TRUE))
+  summarise(fruits = sum(count, na.rm = TRUE))
 
 #usando datos limpios sin NAs
-dt_clean |>
+dt |>
+  filter(count != 0) |> 
   #1. agrupar por sitio
   group_by(site_name) |>
   #2. numero maximo y medio de frutos por sitio
-  summarise(mean_fruit = mean(fruits),
-            max_fruit = max(fruits))
+  summarise(mean_fruit = mean(count),
+            max_fruit = max(count))
 
 ## ---------------------------------------------------------
 
 # Combinar todo lo anterior para crear nuevo dataset resumido
 
 #Resumir frutos y diametro por sitio
-dt_sum <- dt_clean |> 
+dt_sum <- dt |> 
   group_by(site_name) |> 
-  summarise(mean_fruits = mean(fruits_fix, na.rm = TRUE),
+  summarise(mean_fruits = mean(count, na.rm = TRUE),
             mean_diam = mean(stem_diameter_cm, na.rm = TRUE))
 
 dt_sum
-
-#Reusmir diametro por especie
-dt_diam <- dt_clean |> 
-  filter(site_name == "AND") |> 
-  group_by(species_name) |> 
-  summarise(diam = mean(stem_diameter_cm, na.rm = TRUE),
-            diam_sd = sd(stem_diameter_cm, na.rm = TRUE))
-
-dt_diam
 
 
 
@@ -204,5 +192,19 @@ sp_info |> count(shade_tolerance)
 ## ---------------------------------------------------------
 
 #crear dataset combinado
-dt_comb <- dt_clean |> 
+dt_comb <- dt_raw |> 
   left_join(sp_info, by = c("species_name"))
+
+
+
+
+
+## ---------------------------------------------------------
+# REORGANIZAR BASES DE DATOS
+## ---------------------------------------------------------
+
+dt |> 
+  group_by(site_name, year) |> 
+  summarise(fruits = max(count)) |> 
+  pivot_wider(names_from = site_name,
+              values_from = fruits)
